@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: preOnboarding
+  devtools:
+    livereload:
+      enabled: true
+
+  jpa:
+    hibernate:
+      ddl-auto: update
