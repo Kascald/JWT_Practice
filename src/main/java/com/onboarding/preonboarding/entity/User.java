@@ -1,6 +1,7 @@
 package com.onboarding.preonboarding.entity;
 
 
+import com.onboarding.preonboarding.dto.SignUpRequest;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,11 +26,17 @@ public class User implements UserDetails {
 	@Id @Column(unique = true, nullable = false)
 	private UUID id;
 
-	@Column(nullable = false)
 	private String username;
-
-	@Column(nullable = false)
 	private String password;
+
+	private String firstName;
+	private String lastName;
+
+	private String email;
+	private String gender;
+
+	private String phone;
+	private String legion;
 
 	@ElementCollection
 	private List<String> roleList;
@@ -58,5 +65,20 @@ public class User implements UserDetails {
 	public String getUsername() {
 		return this.username;
 	}
+
+	public User extractionFromSignUpRequest(SignUpRequest signUpRequest) {
+		return User.builder()
+				//.id() Auto Creation
+				.username(signUpRequest.getEmail())
+				//password() Setter로 추가할 것
+				.firstName(signUpRequest.getFirstName())
+				.lastName(signUpRequest.getLastName())
+				.email(signUpRequest.getEmail())
+				.gender(signUpRequest.getGender())
+				.phone(signUpRequest.getPhone())
+				.legion(signUpRequest.getLegion())
+				.build();
+	}
+
 
 }

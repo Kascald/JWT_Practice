@@ -1,18 +1,23 @@
 package com.onboarding.preonboarding.controller;
 
 
-import com.onboarding.preonboarding.dto.UserDTO;
+import com.onboarding.preonboarding.dto.SignUpRequest;
+import com.onboarding.preonboarding.dto.UserRes;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = "/user")
+@RequestMapping(value = "/user/api")
 public class UserController {
 
 	@PostMapping("/signup")
-	public ResponseEntity<UserDTO> registUser() {
-        UserDTO  userDTO = null;
-		ResponseEntity<UserDTO> ResponseEntity = null;
+	public ResponseEntity<UserRes> registUser(@RequestBody SignUpRequest signUpRequest) {
+		// service .registration (userDto ) ;
+		// response of service to ResponseEntity
+
+		ResponseEntity<UserRes> ResponseEntity = null;
 		return ResponseEntity;
 	}
+
+
 }
