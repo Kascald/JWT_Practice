@@ -1,7 +1,9 @@
 package com.onboarding.preonboarding.dto;
 
+import com.onboarding.preonboarding.entity.User;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -9,7 +11,7 @@ import java.util.Date;
 
 @Getter
 @RequiredArgsConstructor
-public class SignUpRequest {
+public class SignUpRequest implements UserRequest{
 
 
 	private String firstName;
@@ -37,8 +39,32 @@ public class SignUpRequest {
 		this.gender = gender;
 		this.phone = phone;
 		this.legion = legion;
+	}
 
-		SimpleDateFormat birthInput = new SimpleDateFormat("yyyy-MM-dd");
-		this.birthDayToDate = birthInput.parse(birthDay);
+	@Override
+	public User convertToUserEntity(PasswordEncoder passwordEncoder) throws ParseException {
+		Date thisUserBirthDayDate = this.birthDayToDate(this.getBirthDay());
+		return User.builder()
+				.username(this.getEmail())
+				.password(passwordEncoder.encode(this.getPassword()))
+				.firstName(this.getFirstName())
+				.lastName(this.getLastName())
+				.email(this.getEmail())
+				.gender(this.getGender())
+				.birthDay(thisUserBirthDayDate)
+				.phone(this.getPhone())
+				.legion(this.legion)
+				.build();
+	}
+
+	@Override
+	public Date birthDayToDate(String inputDate) throws ParseException {
+		SimpleDateFormat birthInput = new SimpleDateFormat("yyyy/MM/dd");
+		Date parsedDate = birthInput.parse(inputDate);
+
+		SimpleDateFormat birthOutput = new SimpleDateFormat("yyyy-MM-dd");
+		String formattedDate = birthOutput.format(parsedDate);
+
+		return birthOutput.parse(formattedDate);
 	}
 }

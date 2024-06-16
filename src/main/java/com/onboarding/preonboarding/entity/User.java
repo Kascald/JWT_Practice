@@ -11,10 +11,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Entity
 @Data
@@ -34,6 +31,7 @@ public class User implements UserDetails {
 
 	private String email;
 	private String gender;
+	private Date birthDay;
 
 	private String phone;
 	private String legion;
@@ -78,6 +76,13 @@ public class User implements UserDetails {
 				.phone(signUpRequest.getPhone())
 				.legion(signUpRequest.getLegion())
 				.build();
+	}
+
+	public boolean isAccountExists() {
+		if (this.username == null)
+		    return false;
+		else
+			return true;
 	}
 
 

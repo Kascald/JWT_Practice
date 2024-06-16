@@ -1,4 +1,4 @@
 package com.onboarding.preonboarding.dto;
 
-public class LogoutRequset {
+public class LogoutRequset{
 }
