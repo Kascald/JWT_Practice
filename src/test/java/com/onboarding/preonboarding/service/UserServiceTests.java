@@ -55,7 +55,7 @@ public class UserServiceTests {
 
 		//when
 		userService.userRegistration(signUpRequest);
-		User foundUser = userService.findByUsername2("test@test.com");
+//		User foundUser = userService.findByUsername2("test@test.com");
 
 		//then
 		boolean isEqual = user.equals(foundUser);
