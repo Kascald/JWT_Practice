@@ -78,12 +78,12 @@ public class User implements UserDetails {
 				.build();
 	}
 
-	public boolean isAccountExists() {
-		if (this.username == null)
-		    return false;
-		else
-			return true;
-	}
+//	public boolean isAccountExists() {
+//		if (this.username == null)
+//		    return false;
+//		else
+//			return true;
+//	}
 
 
 }

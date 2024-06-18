@@ -1,9 +1,10 @@
 package com.onboarding.preonboarding.dto;
 
 import com.onboarding.preonboarding.entity.User;
+import com.onboarding.preonboarding.utils.PasswordHasher;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.crypto.password.PasswordEncoder;
+
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -42,11 +43,11 @@ public class SignUpRequest implements UserRequest{
 	}
 
 	@Override
-	public User convertToUserEntity(PasswordEncoder passwordEncoder) throws ParseException {
+	public User convertToUserEntity(PasswordHasher passwordHasher) throws ParseException {
 		Date thisUserBirthDayDate = this.birthDayToDate(this.getBirthDay());
 		return User.builder()
 				.username(this.getEmail())
-				.password(passwordEncoder.encode(this.getPassword()))
+				.password(passwordHasher.hash(this.getPassword()))
 				.firstName(this.getFirstName())
 				.lastName(this.getLastName())
 				.email(this.getEmail())
