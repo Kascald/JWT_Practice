@@ -1,15 +1,25 @@
 package com.onboarding.preonboarding.repository;
 
 import com.onboarding.preonboarding.entity.User;
-import jakarta.transaction.TransactionRolledbackException;
-import jakarta.transaction.TransactionalException;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
-import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
 	Optional<User> findByUsername(String username);
+
+	@Query("SELECT u from User u where LOWER(u.firstName) LIKE LOWER(:firstName) and LOWER(u.lastName) LIKE LOWER(:lastName)")
+	Optional<User> findByFirstNameAndLastName(String firstName, String lastName);
+
+	Optional<User> findByEmail(String email);
+
+	@Query("SELECT u from User u where u.legion LIKE (:legion)")
+	Optional<List<User>> findByLegion(String legion);
+
+	@Query("SELECT u from User u where u.gender LIKE (:gender)")
+	Optional<List<User>> findByGender(String gender);
 }

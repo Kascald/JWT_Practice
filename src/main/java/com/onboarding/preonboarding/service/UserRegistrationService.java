@@ -9,9 +9,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.util.Optional;
 
 import static com.onboarding.preonboarding.exception.UserServiceErrorCode.ALREADY_EXISTS_USERNAME;
+import static com.onboarding.preonboarding.exception.UserServiceErrorCode.USER_NOT_FOUND;
 
 @Service
 public class UserRegistrationService implements UserServiceGeneral {
@@ -26,21 +28,29 @@ public class UserRegistrationService implements UserServiceGeneral {
 		this.userFindService = userFindService;
 	}
 
-
-	public void userRegistration(SignUpRequest signUpRequest) throws Exception {
-		User inputUser = signUpRequest.convertToUserEntity(passwordHasher);
-		inputUser.setPassword(passwordHasher.hash(signUpRequest.getPassword()));
-
-		Optional<User> foundUser = Optional.ofNullable(userFindService.findByUsername(inputUser.getUsername()));
-		loggingObject(foundUser,logger);
-
-		if(foundUser.isPresent()) {
-			throw new UserServiceExceptions(ALREADY_EXISTS_USERNAME);
-		} else {
-			userRepository.save(inputUser);
+	public void userRegistration(SignUpRequest signUpRequest) throws ParseException {
+		User inputUser = convertToUserEntity(signUpRequest);
+		try {
+			confirmDuplicateUser(inputUser.getUsername());
+		} catch (UserServiceExceptions e) {
+			saveUser(inputUser);
 		}
 	}
 
+	private User convertToUserEntity(SignUpRequest signUpRequest) throws ParseException {
+		User inputUser = signUpRequest.convertToUserEntity(passwordHasher);
+		inputUser.setPassword(passwordHasher.hash(signUpRequest.getPassword()));
+		return inputUser;
+	}
+
+	private void confirmDuplicateUser(String username) throws UserServiceExceptions {
+		User foundUser = userFindService.findByUsername(username); // if empty throw Exception
+		loggingObject(foundUser,logger);
+	}
+
+	private void saveUser(User user) {
+		userRepository.save(user);
+	}
 
 
 }

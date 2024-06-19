@@ -7,29 +7,23 @@ import com.onboarding.preonboarding.repository.UserRepository;
 import com.onboarding.preonboarding.utils.PasswordHasher;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import org.slf4j.LoggerFactory;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.security.test.context.support.WithMockUser;
 
 import java.text.ParseException;
 import java.util.Optional;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.util.AssertionErrors.assertFalse;
 import static org.springframework.test.util.AssertionErrors.assertTrue;
 
 
 @SpringBootTest
-@WithMockUser(username = "user" , password = "1234")
-public class UserRegistrationServiceTests {
+class AuthenticationServiceTests {
 
-//	@Autowired
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
 	@MockBean
@@ -44,7 +38,6 @@ public class UserRegistrationServiceTests {
 	@Autowired
 	private PasswordHasher passwordHasher;
 
-
 	private SignUpRequest signUpRequest;
 	private User testUser;
 
@@ -56,14 +49,14 @@ public class UserRegistrationServiceTests {
 
 	public SignUpRequest getSignUpRequest() throws ParseException {
 		return new SignUpRequest("Kim" ,"geunHwi","test@test.com"
-						,"1234","2024/06/16","Male","010-0000-0000"
-						,"South Korea");
+				,"1234","2024/06/16","Male","010-0000-0000"
+				,"South Korea");
 	}
 
 	public User getCreateUserUser() {
 		return User.builder()
 				.username("test@test.com")
-				.password("1234")
+				.password(passwordHasher.hash("1234"))
 				.firstName("kim")
 				.lastName("geunHwi")
 				.email("test@test.com")
@@ -75,19 +68,27 @@ public class UserRegistrationServiceTests {
 
 
 
+
 	@Test
-	public void 유저가입테스트() throws Exception , UserServiceExceptions{
-		//given
-		User inputUser = signUpRequest.convertToUserEntity(passwordHasher);
-		when(userRepository.findByUsername("test@test.com")).thenReturn(Optional.empty());
+	public void 유저_패스워드_매칭확인() throws ParseException {
+		//give
+		User modifyUser = signUpRequest.convertToUserEntity(passwordHasher);
+		when(userRepository.findByUsername("test@test.com")).thenReturn(Optional.of(testUser));
+		User foundUser = null;
+		boolean isMatch = false;
 
 		//when
-		userRegistrationService.userRegistration(signUpRequest);
-		User foundUser = userFindService.findByUsername("test@test.com");
+		try {
+			foundUser = userFindService.findByUsername("test@test.com");
+			logger.info("Found User info : {} ",foundUser.toString());
+			isMatch = passwordHasher.match(signUpRequest.getPassword(), foundUser.getPassword());
+
+		} catch (UserServiceExceptions e) {
+			logger.info("Found User info : Null ");
+		}
 
 		//then
-		assertEquals(inputUser, foundUser, "Expected and found users should be the same: ");
+		assertTrue("User Password Matche : {}", isMatch);
 	}
-
 
 }

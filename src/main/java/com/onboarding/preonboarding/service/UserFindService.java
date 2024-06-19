@@ -3,9 +3,13 @@ package com.onboarding.preonboarding.service;
 import com.onboarding.preonboarding.entity.User;
 import com.onboarding.preonboarding.exception.UserServiceExceptions;
 import com.onboarding.preonboarding.repository.UserRepository;
+import com.onboarding.preonboarding.utils.PasswordHasher;
+import com.onboarding.preonboarding.utils.ResponseCoverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 import static com.onboarding.preonboarding.exception.UserServiceErrorCode.USER_NOT_FOUND;
 
@@ -13,20 +17,50 @@ import static com.onboarding.preonboarding.exception.UserServiceErrorCode.USER_N
 public class UserFindService implements UserServiceGeneral{
 	private final Logger logger = LoggerFactory.getLogger(this.getClass());
 	private final UserRepository userRepository;
+	private final ResponseCoverter responseCoverter;
+	private final PasswordHasher passwordHasher;
 
-	public UserFindService(UserRepository userRepository) {this.userRepository = userRepository;}
+	public UserFindService(UserRepository userRepository, ResponseCoverter responseCoverter, PasswordHasher passwordHasher) {
+		this.userRepository = userRepository;
+		this.responseCoverter = responseCoverter;
+		this.passwordHasher = passwordHasher;
+	}
 
-	//유저 이름기반 조회
-	public  User findByUsername(String username) {
+	//유저 회원가입 아이디 기반 조회
+	public User findByUsername(String username) {
 		return userRepository.findByUsername(username).orElseThrow(
 				()-> new UserServiceExceptions(USER_NOT_FOUND));
 	}
-//	public User findByUsername(String firstName, String LastName)
 
-	//유저 패스워드 매칭확인
-	//유저 정밀 조회
+	//유저 실명 기반 조회
+	public User findByUserRealName(String firstName, String LastName) {
+		return userRepository.findByFirstNameAndLastName(firstName, LastName).orElseThrow(
+				()-> new UserServiceExceptions(USER_NOT_FOUND));
+	}
+	//유저 정밀 조회 - 추후 구현
+
+	//유저 이메일 기반 조회
+	public User findByEmail(String email) {
+		return userRepository.findByEmail(email).orElseThrow(
+				()-> new UserServiceExceptions(USER_NOT_FOUND));
+	}
+
+	//유저 상태 조회
+	//유저 역할 기반 조회
+
 	//유저정보 기반 필터링 정보제공 - legion
+	public List<User> findByLegion(String legion) {
+		return userRepository.findByLegion(legion).orElseThrow(
+				()-> new UserServiceExceptions(USER_NOT_FOUND));
+	}
+
 	//유저정보 기반 필터링 정보 제공 - gender
+	public List<User> findByGender(String gender) {
+		return userRepository.findByGender(gender).orElseThrow(
+				()-> new UserServiceExceptions(USER_NOT_FOUND));
+	}
+
+	//유저 정보 2개 비교
 	public boolean compareUserInfo(User inputUserInfo, User foundeUserInfo) {
 		loggingObject(inputUserInfo,logger);
 		loggingObject(foundeUserInfo,logger);
@@ -49,5 +83,7 @@ public class UserFindService implements UserServiceGeneral{
 
 		return compareScore > 0;
 	}
+
+
 
 }
