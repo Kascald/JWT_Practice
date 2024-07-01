@@ -32,3 +32,9 @@ logging:
   web:
     resources:
       static-locations: file:src/main/resources/static/
+
+myJwtRandomKey :  3P59'DkuUd{\`X4~:VU*rI8_FVD`dsJ[Khomr=DLH-sm4CEH9PL
+myJwtRandomKeyHashed :  $2a$10$ZnH0fjFA65uPbCVpLOWGD.6gWONscDe3fk1d9eSSVgLY7jpW7hIZW`"
+
+accessTokenExpiration : 600000 #60 * 10 * 1000L
+refreshTokenExpiration : 3600000 #60 * 60 * 1000L

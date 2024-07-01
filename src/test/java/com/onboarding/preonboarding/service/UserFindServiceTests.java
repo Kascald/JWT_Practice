@@ -14,10 +14,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
@@ -118,6 +115,24 @@ class UserFindServiceTests {
 			userList.add(user);
 		}
 		return userList;
+	}
+
+	@Test
+	public void 랜덤인트테스트() {
+		Random random = new Random();
+		String randomkey = random.ints(33, 127)
+				.limit(50)
+				.collect(StringBuilder::new,StringBuilder::appendCodePoint,StringBuilder::append)
+				.toString();
+		logger.info("random Key :  {}", randomkey);
+
+		randomkey = passwordHasher.hash(randomkey);
+		logger.info("random Key hashed:  {}", randomkey);
+
+		Base64.Encoder encoder = Base64.getEncoder();
+		byte[] encodedKey = encoder.encode(randomkey.getBytes());
+		logger.info("random Key.getByte() base64 encoded:  {}", encodedKey);
+
 	}
 
 	@Test
