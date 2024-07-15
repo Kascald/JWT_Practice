@@ -13,8 +13,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.sql.Ref;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -26,42 +26,30 @@ import java.util.Map;
 @Service
 public class JWTTokenProvider {
 
-	@Value("${myJwtRandomKeyHashed}")
-	private String jwtSecretKey;
-
 	private SecretKey mySecretKey;
 	private final RefreshTokenRepository refreshTokenRepository;
 
-	@Value("${accessTokenExpiration}")
+	//	@Value("${accessTokenExpiration}")
 	private long ACCESS_EXPIRATION_PERIOD;   //10 min => millseeconds
-	@Value("${refreshTokenExpiration}")
+	//	@Value("${refreshTokenExpiration}")
 	private long REFRESH_EXPIRATION_PERIOD;   //1 hour => millseeconds
 
 
-
-	public JWTTokenProvider(RefreshTokenRepository refreshTokenRepository) {
+	public JWTTokenProvider(RefreshTokenRepository refreshTokenRepository, @Value("${myJwtRandomKeyHashed}")String jwtSecretKey,
+	                        @Value("${accessTokenExpiration}")long accessExpiration, @Value("${refreshTokenExpiration}")long refreshExpriation) {
 		this.refreshTokenRepository = refreshTokenRepository;
-
+		mySecretKey = new SecretKeySpec(jwtSecretKey.getBytes(StandardCharsets.UTF_8), Jwts.SIG.HS256.key().build().getAlgorithm());
+		ACCESS_EXPIRATION_PERIOD = accessExpiration;
+		REFRESH_EXPIRATION_PERIOD = refreshExpriation;
 	}
 
-	@PostConstruct
-	public void init() {
-		byte[] keyBytes = jwtSecretKey.getBytes();
-		mySecretKey = Keys.hmacShaKeyFor(keyBytes);
-	}
-
-//	private SecretKey secretKeyEncode() {
-//		return Keys.hmacShaKeyFor(jwtSecretKey.getBytes());
-//	}
-
-	public String generateToken(String username, String userRealName
+	public String generateToken(String username
 			, List<String> userRole, Long expriation) {
 		ZoneId zoneId = ZoneId.of("Asia/Seoul");
 		Instant now = ZonedDateTime.now(zoneId).toInstant();
 		Date issuedAt = Date.from(now);
 		Date expiration = Date.from(now.plusMillis(expriation));
 		Map<String, Object> claims = new HashMap<>();
-		claims.put("userRealName", userRealName);
 		claims.put("userRole", userRole);
 
 		return Jwts.builder()
@@ -74,12 +62,20 @@ public class JWTTokenProvider {
 				.compact();
 	}
 
-	public String createAccessToken(String username, String userRealName , List<String> userRole) {
-		return generateToken(username, userRealName, userRole, ACCESS_EXPIRATION_PERIOD);
+	public String getUsernameFromToken(String token) {
+		return Jwts.parser().verifyWith(mySecretKey).build().parseSignedClaims(token).getPayload().get("userRealName", String.class);
 	}
 
-	public String createRefreshToken(String username, String userRealName , List<String> userRole) {
-		return generateToken(username, userRealName, userRole, REFRESH_EXPIRATION_PERIOD);
+	public String getRoleList(String token) {
+		return Jwts.parser().verifyWith(mySecretKey).build().parseSignedClaims(token).getPayload().get("roleList", String.class);
+	}
+
+	public String createAccessToken(String username,  List<String> userRole) {
+		return generateToken(username, userRole, ACCESS_EXPIRATION_PERIOD);
+	}
+
+	public String createRefreshToken(String username, List<String> userRole) {
+		return generateToken(username,  userRole, REFRESH_EXPIRATION_PERIOD);
 	}
 
 	public void saveRefreshToken(String refreshToken) {
@@ -123,24 +119,8 @@ public class JWTTokenProvider {
 	}
 
 	public boolean isTokenNotExpiration(String token) {
-		Claims claims = parsePayloadFromToken(token);
-		Date expiration = claims.getExpiration();
-
-		if  (compareExpirationDate(expiration)) {
-			return false;
-		}else {
-			return true;
-		}
+		return Jwts.parser().verifyWith(mySecretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
 	}
-
-	private boolean compareExpirationDate(Date expiration) {
-		ZoneId zoneId = ZoneId.of("Asia/Seoul");
-		Instant now = ZonedDateTime.now(zoneId).toInstant();
-		Date confirmTime = Date.from(now);
-
-		return confirmTime.after(expiration);
-	}
-
 
 	public void setAuthorizationHeaderForAccessToken(HttpServletResponse response, String accessToken) {
 		response.setHeader("authorization", "bearer "+ accessToken);
@@ -151,7 +131,7 @@ public class JWTTokenProvider {
 	}
 
 	public boolean isExistsRefreshToken(String refreshToken) {
-		return refreshTokenRepository.findByRefreshToken(refreshToken).isPresent();
+		return Jwts.parser().verifyWith(mySecretKey).build().parseSignedClaims(refreshToken).getPayload().getExpiration().before(new Date());
 	}
 
 

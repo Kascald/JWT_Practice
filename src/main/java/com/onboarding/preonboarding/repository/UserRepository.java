@@ -12,6 +12,8 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, Long> {
 	Optional<User> findByUsername(String username);
 
+	boolean existsByUsername(String username);
+
 	@Query("SELECT u from User u where LOWER(u.firstName) LIKE LOWER(:firstName) and LOWER(u.lastName) LIKE LOWER(:lastName)")
 	Optional<User> findByFirstNameAndLastName(String firstName, String lastName);
 

@@ -44,6 +44,10 @@ public class UserFindService implements UserServiceGeneral{
 		return userRepository.findByEmail(email).orElseThrow(
 				()-> new UserServiceExceptions(USER_NOT_FOUND));
 	}
+	//유저 중복조회
+	public Boolean existsByUsername(String username) {
+		return userRepository.existsByUsername(username);
+	}
 
 	//유저 상태 조회
 	//유저 역할 기반 조회

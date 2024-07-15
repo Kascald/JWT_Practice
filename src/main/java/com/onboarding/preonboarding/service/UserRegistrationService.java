@@ -10,6 +10,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static com.onboarding.preonboarding.exception.UserServiceErrorCode.ALREADY_EXISTS_USERNAME;
@@ -31,22 +34,21 @@ public class UserRegistrationService implements UserServiceGeneral {
 	public void userRegistration(SignUpRequest signUpRequest) throws ParseException {
 		User inputUser = convertToUserEntity(signUpRequest);
 		try {
-			confirmDuplicateUser(inputUser.getUsername());
-		} catch (UserServiceExceptions e) {
+			Boolean isExists = userRepository.existsByUsername(inputUser.getUsername());
+			if(isExists) {throw new UserServiceExceptions(ALREADY_EXISTS_USERNAME);}
 			saveUser(inputUser);
+		} catch (UserServiceExceptions e) {
+			e.printStackTrace();
 		}
 	}
 
 	private User convertToUserEntity(SignUpRequest signUpRequest) throws ParseException {
 		User inputUser = signUpRequest.convertToUserEntity(passwordHasher);
 		inputUser.setPassword(passwordHasher.hash(signUpRequest.getPassword()));
+		inputUser.setRoleList(List.of("USER"));
 		return inputUser;
 	}
 
-	private void confirmDuplicateUser(String username) throws UserServiceExceptions {
-		User foundUser = userFindService.findByUsername(username); // if empty throw Exception
-		loggingObject(foundUser,logger);
-	}
 
 	private void saveUser(User user) {
 		userRepository.save(user);

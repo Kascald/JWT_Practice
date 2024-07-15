@@ -18,7 +18,7 @@ import java.util.*;
 @Builder
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class User implements UserDetails {
+public class User{
 
 	@Id @Column(unique = true, nullable = false)
 	private UUID id;
@@ -45,23 +45,6 @@ public class User implements UserDetails {
 		if (id == null) {
 			id = UUID.randomUUID();
 		}
-	}
-
-	@Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		List<GrantedAuthority> authorities = new ArrayList<>();
-		this.roleList.stream().map( role-> authorities.add(new SimpleGrantedAuthority(role)));
-		return authorities;
-	}
-
-	@Override
-	public String getPassword() {
-		return this.password;
-	}
-
-	@Override
-	public String getUsername() {
-		return this.username;
 	}
 
 	public User extractionFromSignUpRequest(SignUpRequest signUpRequest) {
