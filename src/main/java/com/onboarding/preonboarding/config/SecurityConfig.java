@@ -56,7 +56,7 @@ public class SecurityConfig {
 		http.httpBasic(AbstractHttpConfigurer::disable); */
 
 		http.authorizeHttpRequests((auth)-> auth
-				.requestMatchers("/login", "/", "/join").permitAll()
+				.requestMatchers("/user/api/login", "/", "/user/api/signup","/user/**").permitAll()
 				.anyRequest().authenticated());
 		http.addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration),jwtTokenProvider,refreshTokenRepository), UsernamePasswordAuthenticationFilter.class);
 

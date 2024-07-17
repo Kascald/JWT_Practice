@@ -1,9 +1,14 @@
 package com.onboarding.preonboarding.dto;
 
 
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 
-@Setter
+@Setter @Getter
+@RequiredArgsConstructor
+@AllArgsConstructor
 public class UserRes {
 	private String status;
 	private String message;

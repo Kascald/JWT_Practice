@@ -18,10 +18,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class JWTTokenProvider {
@@ -127,12 +124,23 @@ public class JWTTokenProvider {
 	}
 
 	public void setAuthorizationHeaderForRefreshToken(HttpServletResponse response, String refreshToken) {
-		response.setHeader("authorization", "bearer "+ refreshToken);
+		response.setHeader("Refresh-Token", "bearer "+ refreshToken);
 	}
 
 	public boolean isExistsRefreshToken(String refreshToken) {
 		return Jwts.parser().verifyWith(mySecretKey).build().parseSignedClaims(refreshToken).getPayload().getExpiration().before(new Date());
 	}
 
+	public boolean isRefreshTokenValid(String token) {
+		if (!validateToken(token)) {
+			return false;
+		}
 
+		Optional<RefreshToken> refreshToken = refreshTokenRepository.findByRefreshToken(token);
+		return refreshToken.isPresent() && refreshToken.get().getExpiration().after(new Date());
+	}
+
+	public void deleteRefreshToken(String token) {
+		refreshTokenRepository.deleteByRefreshToken(token);
+	}
 }

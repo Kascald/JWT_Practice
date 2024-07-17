@@ -1,6 +1,7 @@
 package com.onboarding.preonboarding.SecureLogin;
 
 import com.onboarding.preonboarding.dto.CustomUserDetials;
+import com.onboarding.preonboarding.entity.RefreshToken;
 import com.onboarding.preonboarding.repository.RefreshTokenRepository;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.IOException;
@@ -18,6 +19,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter   {
@@ -53,9 +55,23 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter   {
 				.map(GrantedAuthority::getAuthority)
 				.toList();
 
-		String token = jwtTokenProvider.createAccessToken(username, roles);
+		String accessToken = jwtTokenProvider.createAccessToken(username, roles);
+		String refreshToken;
 
-		res.setHeader("Authorization", "Bearer " + token);
+		Optional<RefreshToken> existingRefreshToken = refreshTokenRepository.findBySubject(username);
+		if (existingRefreshToken.isPresent()) {
+			String existingToken = existingRefreshToken.get().getRefreshToken();
+			if (jwtTokenProvider.isRefreshTokenValid(existingToken)) {
+				refreshToken = existingToken;
+			} else {
+				jwtTokenProvider.deleteRefreshToken(existingToken);
+				refreshToken = jwtTokenProvider.createRefreshToken(username,roles);
+			}
+		} else {
+			refreshToken = jwtTokenProvider.createRefreshToken(username,roles);
+		}
+		jwtTokenProvider.setAuthorizationHeaderForAccessToken(res, accessToken);
+		jwtTokenProvider.setAuthorizationHeaderForRefreshToken(res, refreshToken);
 	}
 
 	@Override
