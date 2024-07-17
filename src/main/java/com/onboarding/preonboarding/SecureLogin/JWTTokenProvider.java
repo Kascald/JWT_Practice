@@ -6,8 +6,6 @@ import com.onboarding.preonboarding.repository.RefreshTokenRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.security.Keys;
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -19,6 +17,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 public class JWTTokenProvider {
@@ -63,8 +62,24 @@ public class JWTTokenProvider {
 		return Jwts.parser().verifyWith(mySecretKey).build().parseSignedClaims(token).getPayload().get("userRealName", String.class);
 	}
 
-	public String getRoleList(String token) {
-		return Jwts.parser().verifyWith(mySecretKey).build().parseSignedClaims(token).getPayload().get("roleList", String.class);
+	public List<String> getRoleList(String token) {
+		Claims claims = Jwts.parser()
+				.verifyWith(mySecretKey)
+				.build()
+				.parseSignedClaims(token)
+				.getPayload();
+
+		List<?> rawList = claims.get("userRole", List.class);
+		List<String> roleList = null;
+
+		if (rawList != null) {
+			roleList = rawList.stream()
+					.filter(item -> item instanceof String)
+					.map(item -> (String) item)
+					.collect(Collectors.toList());
+		}
+
+		return roleList;
 	}
 
 	public String createAccessToken(String username,  List<String> userRole) {
@@ -115,7 +130,7 @@ public class JWTTokenProvider {
 		}
 	}
 
-	public boolean isTokenNotExpiration(String token) {
+	public boolean isTokenExpiration(String token) {
 		return Jwts.parser().verifyWith(mySecretKey).build().parseSignedClaims(token).getPayload().getExpiration().before(new Date());
 	}
 

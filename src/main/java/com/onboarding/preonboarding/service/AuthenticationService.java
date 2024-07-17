@@ -1,6 +1,7 @@
 package com.onboarding.preonboarding.service;
 
 import com.onboarding.preonboarding.SecureLogin.JWTTokenProvider;
+import com.onboarding.preonboarding.dto.UserDTO;
 import com.onboarding.preonboarding.entity.User;
 import com.onboarding.preonboarding.exception.UserServiceExceptions;
 import com.onboarding.preonboarding.utils.PasswordHasher;
@@ -27,9 +28,11 @@ public class AuthenticationService {
 
 	//유저 패스워드 매칭확인
 	public boolean isMatchPassword(String username, String rawPassword) {
-		User foundUser = null;
+		UserDTO foundUser = null;
+//		User foundUser = null;
 		try {
-			foundUser =  userFindService.findByUsername(username);
+			foundUser =  userFindService.findUserDTOByUsername(username);
+//			foundUser =  userFindService.findByUsername(username);
 			return passwordHasher.match(rawPassword ,foundUser.getPassword());
 		} catch (UserServiceExceptions e) {
 			return false;

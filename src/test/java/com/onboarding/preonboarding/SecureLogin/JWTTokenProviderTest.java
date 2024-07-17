@@ -99,7 +99,7 @@ public class JWTTokenProviderTest {
 	@Test
 	public void testIsTokenNotExpired() {
 		String token = jwtTokenProvider.createAccessToken("testUser",  Arrays.asList("ROLE_USER"));
-		assertFalse(jwtTokenProvider.isTokenNotExpiration(token));
+		assertFalse(jwtTokenProvider.isTokenExpiration(token));
 	}
 
 	@Test

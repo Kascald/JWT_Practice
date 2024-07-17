@@ -3,19 +3,16 @@ package com.onboarding.preonboarding.entity;
 
 import com.onboarding.preonboarding.dto.SignUpRequest;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import lombok.*;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 @Entity
 @Data
 @Builder
+@ToString
 @AllArgsConstructor
 @RequiredArgsConstructor
 public class User{
@@ -60,13 +57,4 @@ public class User{
 				.legion(signUpRequest.getLegion())
 				.build();
 	}
-
-//	public boolean isAccountExists() {
-//		if (this.username == null)
-//		    return false;
-//		else
-//			return true;
-//	}
-
-
 }

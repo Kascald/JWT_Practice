@@ -1,5 +1,6 @@
 package com.onboarding.preonboarding.service;
 
+import com.onboarding.preonboarding.dto.UserDTO;
 import com.onboarding.preonboarding.entity.User;
 import com.onboarding.preonboarding.exception.UserServiceExceptions;
 import com.onboarding.preonboarding.repository.UserRepository;
@@ -7,7 +8,9 @@ import com.onboarding.preonboarding.utils.PasswordHasher;
 import com.onboarding.preonboarding.utils.ResponseCoverter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -30,6 +33,13 @@ public class UserFindService implements UserServiceGeneral{
 	public User findByUsername(String username) {
 		return userRepository.findByUsername(username).orElseThrow(
 				()-> new UserServiceExceptions(USER_NOT_FOUND));
+	}
+
+	@Transactional(readOnly = true)
+	public UserDTO findUserDTOByUsername(String username) {
+		User user = userRepository.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("User not found with username: " + username));
+		return new UserDTO(user);
 	}
 
 	//유저 실명 기반 조회

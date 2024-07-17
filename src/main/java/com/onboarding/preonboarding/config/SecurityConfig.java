@@ -2,6 +2,7 @@ package com.onboarding.preonboarding.config;
 
 
 import com.onboarding.preonboarding.SecureLogin.CustomLoginFilter;
+import com.onboarding.preonboarding.SecureLogin.JWTFilter;
 import com.onboarding.preonboarding.SecureLogin.JWTTokenProvider;
 import com.onboarding.preonboarding.repository.RefreshTokenRepository;
 import com.onboarding.preonboarding.utils.PasswordHasher;
@@ -31,6 +32,7 @@ public class SecurityConfig {
 		this.refreshTokenRepository = refreshTokenRepository;
 	}
 
+	@Bean
 	public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
 		return authenticationConfiguration.getAuthenticationManager();
 	}
@@ -56,8 +58,11 @@ public class SecurityConfig {
 		http.httpBasic(AbstractHttpConfigurer::disable); */
 
 		http.authorizeHttpRequests((auth)-> auth
-				.requestMatchers("/user/api/login", "/", "/user/api/signup","/user/**").permitAll()
+				.requestMatchers("/user/api/login", "/", "/user/api/signup","/user/**","login").permitAll()
 				.anyRequest().authenticated());
+
+		http.addFilterBefore(new JWTFilter(jwtTokenProvider), CustomLoginFilter.class);
+
 		http.addFilterAt(new CustomLoginFilter(authenticationManager(authenticationConfiguration),jwtTokenProvider,refreshTokenRepository), UsernamePasswordAuthenticationFilter.class);
 
 		http.sessionManagement((session)-> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

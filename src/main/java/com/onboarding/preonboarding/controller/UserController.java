@@ -62,13 +62,27 @@ public class UserController {
 
 	}
 
-	@PostMapping("/login")
-	public ResponseEntity<UserRes> loginUser(@RequestBody LoginRequest loginRequest) {
-
-
-		ResponseEntity<UserRes> ResponseEntity = null;
-		return ResponseEntity;
-	}
+//	@PostMapping("/login")
+//	public ResponseEntity<UserRes> loginUser(@RequestBody LoginRequest loginRequest) {
+//		ResponseEntity<UserRes> resResponseEntity;
+//		try {
+//			// service .registration (userDto ) ;
+//			userRegistrationService.userRegistration(loginRequest);
+//
+//			UserRes userRes = new UserRes("Ok","Done","/user/api/signup",
+//			                              loginRequest.getEmail(),loginRequest.getFirstName(),loginRequest.getLastName());
+//			resResponseEntity= ResponseEntity.status(HttpStatus.OK).body(userRes);
+//			logger.info("응답 성공");
+//			return resResponseEntity;
+//
+//		} catch (ParseException e) {
+//			// response of service to ResponseEntity
+//			UserRes userRes = new UserRes("Parse_error","Retry it","/user/api/signup",
+//			                              loginRequest.getEmail(),loginRequest.getFirstName(),loginRequest.getLastName());
+//			resResponseEntity= ResponseEntity.status(HttpStatus.BAD_REQUEST).body(userRes);
+//			return resResponseEntity;
+//		}
+//	}
 
 
 }

@@ -1,9 +1,8 @@
 package com.onboarding.preonboarding.SecureLogin;
 
-import com.onboarding.preonboarding.dto.CustomUserDetials;
+import com.onboarding.preonboarding.dto.CustomUserDetails;
 import com.onboarding.preonboarding.entity.RefreshToken;
 import com.onboarding.preonboarding.repository.RefreshTokenRepository;
-import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -17,10 +16,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter   {
 	private final AuthenticationManager authenticationManager;
@@ -39,16 +36,16 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter   {
 		String username = obtainUsername(req);
 		String password = obtainPassword(req);
 
-		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
+		UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password,null);
 
 		return authenticationManager.authenticate(authRequest);
 	}
 
 	@Override
-	public void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) throws IOException, ServletException {
+	public void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) {
 		System.out.println("Successful Authentication");
-		CustomUserDetials customUserDetials = (CustomUserDetials)auth.getPrincipal();
-		String username = customUserDetials.getUsername();
+		CustomUserDetails customUserDetails = (CustomUserDetails)auth.getPrincipal();
+		String username = customUserDetails.getUsername();
 
 		Collection<? extends GrantedAuthority> authorities = auth.getAuthorities();
 		List<String> roles = authorities.stream()
@@ -56,6 +53,11 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter   {
 				.toList();
 
 		String accessToken = jwtTokenProvider.createAccessToken(username, roles);
+		if (accessToken == null) {
+			System.err.println("Access token is null");
+		} else {
+			System.out.println("Access token generated: " + accessToken);
+		}
 		String refreshToken;
 
 		Optional<RefreshToken> existingRefreshToken = refreshTokenRepository.findBySubject(username);
@@ -79,5 +81,6 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter   {
 	                                       HttpServletResponse res,
 	                                       AuthenticationException failed) throws IOException, ServletException{
 		System.out.println("Unsuccessful Authentication");
+		res.setStatus(401);
 	}
 }
