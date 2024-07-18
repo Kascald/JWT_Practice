@@ -4,6 +4,7 @@ package com.onboarding.preonboarding.controller;
 import com.onboarding.preonboarding.dto.LoginRequest;
 import com.onboarding.preonboarding.dto.SignUpRequest;
 import com.onboarding.preonboarding.dto.UserRes;
+import com.onboarding.preonboarding.exception.UserServiceExceptions;
 import com.onboarding.preonboarding.service.AuthenticationService;
 import com.onboarding.preonboarding.service.UserAuthenticationService;
 import com.onboarding.preonboarding.service.UserRegistrationService;
@@ -12,10 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
 
@@ -60,6 +58,11 @@ public class UserController {
 			return resResponseEntity;
 		}
 
+	}
+
+	@ExceptionHandler(UserServiceExceptions.class)
+	public ResponseEntity<String> handleUserServiceException(UserServiceExceptions ex) {
+		return new ResponseEntity<>(ex.getMessage(), HttpStatus.CONFLICT); // HTTP 409 Conflict
 	}
 
 //	@PostMapping("/login")

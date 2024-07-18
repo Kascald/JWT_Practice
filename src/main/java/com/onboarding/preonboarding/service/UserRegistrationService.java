@@ -45,7 +45,8 @@ public class UserRegistrationService implements UserServiceGeneral {
 	private User convertToUserEntity(SignUpRequest signUpRequest) throws ParseException {
 		User inputUser = signUpRequest.convertToUserEntity(passwordHasher);
 		inputUser.setPassword(passwordHasher.hash(signUpRequest.getPassword()));
-		inputUser.setRoleList(List.of("USER"));
+//		inputUser.setRoleList(List.of("USER"));
+		inputUser.setRoleList(List.of("ADMIN"));
 		return inputUser;
 	}
 

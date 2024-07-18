@@ -48,19 +48,32 @@ public class JWTFilter extends OncePerRequestFilter {
 
 		String username = jwtTokenProvider.getUsernameFromToken(token);
 		List<String> roleList = jwtTokenProvider.getRoleList(token);
+		logger.info("token sub : {} , role : {}",username , roleList);
 
-		UserDTO thisUser = new UserDTO();
-//		User thisUser = new User();
+		//		UserDTO thisUser = new UserDTO();
+		User thisUser = new User();
 		thisUser.setUsername(username);
 		thisUser.setRoleList(roleList);
 		thisUser.setPassword("temp");
 
 		CustomUserDetails customUserDetails = new CustomUserDetails(thisUser);
+		logger.info("CustomUserDetails created: " + customUserDetails);
 
-		Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails,
-		                                                                   null,customUserDetails.getAuthorities());
+		Authentication authToken = new UsernamePasswordAuthenticationToken(customUserDetails,null,customUserDetails.getAuthorities());
+		logger.info("Authentication token created: " + authToken);
 
 		SecurityContextHolder.getContext().setAuthentication(authToken);
+		logger.info("Security context updated with authentication token");
+
+		// 추가 로그: SecurityContextHolder의 Authentication 객체 확인
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		if (auth != null) {
+			logger.info("SecurityContextHolder Authentication: " + auth);
+			logger.info("Principal: " + auth.getPrincipal());
+			logger.info("Authorities: " + auth.getAuthorities());
+		} else {
+			logger.info("SecurityContextHolder Authentication is null");
+		}
 
 		filterChain.doFilter(request, response);
 	}

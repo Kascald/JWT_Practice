@@ -2,7 +2,6 @@ package com.onboarding.preonboarding.service;
 
 import com.onboarding.preonboarding.SecureLogin.JWTTokenProvider;
 import com.onboarding.preonboarding.dto.UserDTO;
-import com.onboarding.preonboarding.entity.User;
 import com.onboarding.preonboarding.exception.UserServiceExceptions;
 import com.onboarding.preonboarding.utils.PasswordHasher;
 import jakarta.servlet.http.HttpServletRequest;

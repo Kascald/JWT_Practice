@@ -10,17 +10,18 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class CustomUserDetails implements UserDetails {
-	private final UserDTO user;
-	//	private final User user;
+//	private final UserDTO user;
+	private final User user;
 
 	//	public CustomUserDetails(User user) {
-	public CustomUserDetails(UserDTO user) {
+	public CustomUserDetails(User user) {
 		this.user = user;
 	}
 
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		return user.getRoleList().stream()
+				.map(role -> role.startsWith("ROLE_") ? role : "ROLE_" + role)
 				.map(SimpleGrantedAuthority::new)
 				.collect(Collectors.toList());
 	}

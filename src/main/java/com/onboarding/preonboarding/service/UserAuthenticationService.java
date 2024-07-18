@@ -21,12 +21,12 @@ public class UserAuthenticationService implements UserDetailsService {
 		this.userFindService = userFindService;
 	}
 
-//	@Transactional
+	@Transactional
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-		UserDTO user = userFindService.findUserDTOByUsername(username);
-//		User user = userFindService.findByUsername(username);
+//		UserDTO user = userFindService.findUserDTOByUsername(username);
+		User user = userFindService.findByUsername(username);
 		logger.info("user = {}",user.getUsername());
 
 		if (user == null) {

@@ -59,7 +59,7 @@ public class JWTTokenProvider {
 	}
 
 	public String getUsernameFromToken(String token) {
-		return Jwts.parser().verifyWith(mySecretKey).build().parseSignedClaims(token).getPayload().get("userRealName", String.class);
+		return Jwts.parser().verifyWith(mySecretKey).build().parseSignedClaims(token).getPayload().get("sub", String.class);
 	}
 
 	public List<String> getRoleList(String token) {
@@ -135,11 +135,11 @@ public class JWTTokenProvider {
 	}
 
 	public void setAuthorizationHeaderForAccessToken(HttpServletResponse response, String accessToken) {
-		response.setHeader("authorization", "bearer "+ accessToken);
+		response.setHeader("Authorization", "Bearer "+ accessToken);
 	}
 
 	public void setAuthorizationHeaderForRefreshToken(HttpServletResponse response, String refreshToken) {
-		response.setHeader("Refresh-Token", "bearer "+ refreshToken);
+		response.setHeader("Refresh-Token", "Bearer "+ refreshToken);
 	}
 
 	public boolean isExistsRefreshToken(String refreshToken) {
