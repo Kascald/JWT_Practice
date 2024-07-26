@@ -2,7 +2,7 @@ Spring Boot 시큐리티 / JWT 토큰 연습
 
 ## bootPractice
 
-## Refresh Token 확장판 [바로가기](https://github.com/Kascald/JWT_Practice-w.RefreshToken)
+## Refresh Token 적용은 다음으로 [바로가기](https://github.com/Kascald/JWT_Practice-w.RefreshToken)
 ### 프로젝트 설명
 
 bootPractice 
